@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Random;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +48,23 @@ public class VotanteService {
 		if(difYears > 100)
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Debe tener maximo 100 años");
 		
+		
 		votanteDTO.setTelefono(validations.selectDefaultValue(votanteDTO.getTelefono(), ""));
 		votanteDTO.setFoto(validations.selectDefaultValue(votanteDTO.getFoto(), ""));
+		
+		Random random = new Random();
+		String password = "";
+		for(int i=0; i<10; i++){
+			int r = random.nextInt(10);
+			password += '0' + r;
+		}
+		votanteDTO.setPassword(password);
 		
 		if(votanteRepository.existsById(votanteDTO.getCedula()))
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe un usuario con esa cedula");
 	
 		Votante votante = modelMapper.map(votanteDTO, Votante.class);
+		votante.setActivo(true);
 		Votante votanteRespuesta = votanteRepository.save(votante);
 		VotanteDTO votanteRespuestaDTO = modelMapper.map(votanteRespuesta, VotanteDTO.class);
 		return votanteRespuestaDTO;

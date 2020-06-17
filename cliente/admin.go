@@ -1,54 +1,13 @@
 package main
 
 import "fmt"
-//import "reflect"
-//import "net/http"
-import "time"
-
-//import "main/objects"
 import "main/modules"
-import "main/jsontypes"
 import "main/readers"
 
-type JsonString = jsontypes.JsonString
-type JsonInt = jsontypes.JsonInt
-type JsonFloat = jsontypes.JsonFloat
-type JsonBool = jsontypes.JsonBool
-
-
-func tiempo(){
-	//location, err := time.LoadLocation("America/Bogota")
-	location, err := time.LoadLocation("-05:00")
-	fmt.Println(location, "-", err)
-	fmt.Println(time.Now())
-	time2 := time.Time{}
-	fmt.Println(time2.UTC())
-	fmt.Println(time2.Local().UTC())
-	name, off := time.Now().Zone()
-	fmt.Println(name)
-	fmt.Println(off)
-
-	fmt.Println(time.Now().Zone())
-}
-
-func leerFoto(){
- 	fileReader := readers.NewFileReader(2*1024*1024)
- 	path := "/home/usuario/Descargas/pain.jpg"
- 	fileString, err := fileReader.ReadAsHexadecimalString(path)
-
- 	if err == nil {
- 		fmt.Println(fileString[0:100])
- 		fmt.Println(len(fileString))
-
- 	}else{
- 		fmt.Println(err)
- 	}
-}
 
 func menu(){
 	lineReader := readers.NewLineReader()
 	var option string
-
 
 	fmt.Println("Funciones:")
 	// Partidos
@@ -67,7 +26,7 @@ func menu(){
 	fmt.Println("11. Editar eleccion")
 	fmt.Println("12. Finalizar eleccion")
 	fmt.Println("13. Cancelar eleccion")
-	fmt.Println("14. [X] Consultar resultado de una eleccion")
+	fmt.Println("14. Consultar resultado de una eleccion")
 	fmt.Println("15. Listar elecciones")
 	// Votantes
 /*	fmt.Println("16. Ver informacion de votante")
@@ -107,7 +66,8 @@ func menu(){
 		modules.FinalizarEleccion()
 	case "13":
 		modules.CancelarEleccion()
-	//case "14":
+	case "14":
+		modules.MostrarResultadoEleccion()
 	case "15":
 		modules.ListarElecciones()
 	default:
@@ -117,5 +77,12 @@ func menu(){
 
 
 func main(){
-	menu()
+	lineReader := readers.NewLineReader()
+	fmt.Println("admin[S/], votante: ")
+	line := lineReader.ReadLine()
+	if line == "S" {
+		menu()
+	}else {
+		menuVotante()
+	}
 }

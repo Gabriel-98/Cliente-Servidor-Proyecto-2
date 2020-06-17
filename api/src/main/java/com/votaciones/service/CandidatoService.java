@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.utilities.FileBytes;
 import com.utilities.validations;
 import com.votaciones.dto.CandidatoDTO;
 import com.votaciones.entity.Candidato;
@@ -65,8 +66,6 @@ public class CandidatoService {
 		Candidato candidato = modelMapper.map(candidatoDTO, Candidato.class);
 		Candidato candidatoRespuesta = candidatoRepository.save(candidato);
 		CandidatoDTO candidatoRespuestaDTO = modelMapper.map(candidatoRespuesta, CandidatoDTO.class);
-		System.out.println(candidatoRespuestaDTO);
-		
 		return candidatoRespuestaDTO;
 	}
 	
@@ -112,8 +111,11 @@ public class CandidatoService {
 		List<Candidato> candidatos = candidatoRepository.findAll();
 		List<CandidatoDTO> candidatosDTO = new LinkedList<CandidatoDTO>();
 		ListIterator<Candidato> iterator = candidatos.listIterator();
-		while(iterator.hasNext())
-		candidatosDTO.add(modelMapper.map(iterator.next(), CandidatoDTO.class));
+		while(iterator.hasNext()){
+			Candidato candidato = iterator.next();
+			candidato.setFoto(null);
+			candidatosDTO.add(modelMapper.map(candidato, CandidatoDTO.class));
+		}
 		return candidatosDTO;
 	}
 	
@@ -129,8 +131,11 @@ public class CandidatoService {
 		List<Candidato> candidatos = candidatoRepository.findAllByPartidoOrderByCedulaAsc(partido);
 		List<CandidatoDTO> candidatosDTO = new LinkedList<CandidatoDTO>();
 		ListIterator<Candidato> iterator = candidatos.listIterator();
-		while(iterator.hasNext())
-		candidatosDTO.add(modelMapper.map(iterator.next(), CandidatoDTO.class));
+		while(iterator.hasNext()){
+			Candidato candidato = iterator.next();
+			candidato.setFoto(null);
+			candidatosDTO.add(modelMapper.map(candidato, CandidatoDTO.class));
+		}
 		return candidatosDTO;
 	}
 	
@@ -149,6 +154,7 @@ public class CandidatoService {
 		while(iterator.hasNext()){
 			ResultadoCandidato resultadoCandidato = iterator.next();
 			Candidato candidato = resultadoCandidato.getCandidato();
+			candidato.setFoto(null);
 			CandidatoDTO candidatoDTO = modelMapper.map(candidato, CandidatoDTO.class);
 			candidatosDTO.add(candidatoDTO);
 		}
@@ -207,5 +213,19 @@ public class CandidatoService {
 		ResultadoCandidato resultadoCandidato = optionalResultadoCandidato.get();
 		resultadoCandidatoRepository.delete(resultadoCandidato);
 		return true;
+	}
+	
+	public byte[] mostrarFoto(String cedula){
+		validations.nonNullValidationResponse(cedula, "Error! La cedula no puede ser nula");
+			
+		Optional<Candidato> optionalCandidato = candidatoRepository.findById(cedula);
+		if(!optionalCandidato.isPresent())
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! No existe un candidato con esa cedula");
+	
+		Candidato candidato = optionalCandidato.get();
+		String foto = candidato.getFoto();
+		
+		FileBytes fotoBytes = new FileBytes(foto);
+		return fotoBytes.getByteArray();
 	}
 }

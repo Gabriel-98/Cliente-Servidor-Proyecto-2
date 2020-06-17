@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.votaciones.dto.EleccionDTO;
+import com.votaciones.dto.ResultadoCandidatoDTO;
 import com.votaciones.service.EleccionService;
 
 @RestController
@@ -41,10 +42,10 @@ public class EleccionController {
 		return eleccionService.cancelar(codigo);
 	}
 	
-	/*@GetMapping("/{codigo}/resultado")
+	@GetMapping("/{codigo}/resultado")
 	public List<ResultadoCandidatoDTO> resultadoEleccion(@PathVariable("codigo") String codigo){
 		return eleccionService.resultadoEleccion(codigo);
-	}*/
+	}
 	
 	@GetMapping("/*/filtro/{filtro}/zona-horaria/{zona}")
 	public List<EleccionDTO> listar(@PathVariable("filtro") String filtro, @PathVariable("zona") String zona){

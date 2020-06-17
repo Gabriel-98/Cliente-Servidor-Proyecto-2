@@ -16,14 +16,26 @@ import org.springframework.web.server.ResponseStatusException;
 import com.utilities.Time;
 import com.utilities.validations;
 import com.votaciones.dto.EleccionDTO;
+import com.votaciones.dto.ResultadoCandidatoDTO;
 import com.votaciones.entity.Eleccion;
+import com.votaciones.entity.ResultadoCandidato;
+import com.votaciones.entity.Votante;
+import com.votaciones.entity.Voto;
 import com.votaciones.repository.EleccionRepository;
+import com.votaciones.repository.ResultadoCandidatoRepository;
+import com.votaciones.repository.VotanteRepository;
 
 @Service
 public class EleccionService{
 	
 	@Autowired
 	EleccionRepository eleccionRepository;
+	
+	@Autowired
+	ResultadoCandidatoRepository resultadoCandidatoRepository;
+	
+	@Autowired
+	VotanteRepository votanteRepository;
 	
 	@Autowired
 	ModelMapper modelMapper;
@@ -63,6 +75,17 @@ public class EleccionService{
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe una eleccion con ese codigo");
 		if(eleccionRepository.existsByNombre(eleccion.getNombre()))
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe una eleccion con ese nombre");
+		
+		/*List<Votante> votantes = votanteRepository.findAllByActivo(true);
+		List<Voto> votos = new LinkedList<Voto>();
+		ListIterator<Votante> iterator = votantes.listIterator();
+		while(iterator.hasNext()){
+			Voto voto = new Voto();
+			voto.setEleccion(eleccion);
+			voto.setVotante(iterator.next());
+			voto.setCedulaCandidato(null);
+			votos.add(voto);
+		}*/
 		
 		Eleccion eleccionRespuesta = eleccionRepository.save(eleccion);
 		EleccionDTO eleccionRespuestaDTO = modelMapper.map(eleccionRespuesta, EleccionDTO.class);
@@ -194,7 +217,22 @@ public class EleccionService{
 	}
 	
 	
-	//public List<VotoDTO> resultadoEleccion(String codigo){}
+	public List<ResultadoCandidatoDTO> resultadoEleccion(String codigo){
+		validations.nonNullValidationResponse(codigo, "Error! El codigo no debe ser nulo");
+		
+		Optional<Eleccion> optionalEleccion = eleccionRepository.findById(codigo);
+		if(!optionalEleccion.isPresent())
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! No existe una eleccion con ese codigo");
+		
+		Eleccion eleccion = optionalEleccion.get();
+		
+		List<ResultadoCandidato> resultadoCandidatos = resultadoCandidatoRepository.findAllByEleccionOrderByNumeroVotosDesc(eleccion);
+		List<ResultadoCandidatoDTO> resultadoCandidatosDTO = new LinkedList<ResultadoCandidatoDTO>();
+		ListIterator<ResultadoCandidato> iterator = resultadoCandidatos.listIterator();
+		while(iterator.hasNext())
+		resultadoCandidatosDTO.add(modelMapper.map(iterator.next(), ResultadoCandidatoDTO.class));
+		return resultadoCandidatosDTO;
+	}
 	
 	
 	public List<EleccionDTO> listar(String filtro, String zonaHoraria){

@@ -2,6 +2,7 @@ package modules
 
 import "fmt"
 import "time"
+import "strconv"
 import "main/configuration"
 import "main/objects"
 import "main/readers"
@@ -9,6 +10,7 @@ import "main/jsontypes"
 import "main/utilities"
 
 type Eleccion = objects.Eleccion
+type ResultadoCandidato = objects.ResultadoCandidato
 type ErrorStatusMessage = objects.ErrorStatusMessage
 
 
@@ -58,6 +60,47 @@ func CancelarEleccion(){
 	codigo := reader.ReadLine()
 	request, _ := utilities.CreateRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/cancelar", nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
+}
+
+func MostrarResultadoEleccion(){
+	lineReader := readers.NewLineReader()
+	fmt.Println("RESULTADO ELECCION")
+	fmt.Print("Ingrese el codigo de la eleccion: ")
+	codigoEleccion := lineReader.ReadLine()
+
+	var resultadoCandidatos []ResultadoCandidato
+	request, err := utilities.CreateRequest("GET", configuration.UrlElecciones + "/" + codigoEleccion + "/resultado", nil)
+	err = utilities.SendRequest(request, &resultadoCandidatos, &ErrorStatusMessage{})
+
+	if err == nil {
+		var candidatos []Candidato
+		request, _ = utilities.CreateRequest("GET", configuration.UrlCandidatos + "/*/eleccion/" + codigoEleccion, nil)
+		err = utilities.SendRequest(request, &candidatos, &ErrorStatusMessage{})
+
+		fmt.Println(resultadoCandidatos)
+		fmt.Println(candidatos)
+
+		mapaCandidatos := make(map[string]Candidato)
+		for i:=0; i<len(candidatos); i++ {
+			mapaCandidatos[candidatos[i].Cedula.Value] = candidatos[i]
+		}
+
+		utilities.PrintCenter("CEDULA", 10)
+		utilities.PrintCenter("NOMBRE", 10)
+		utilities.PrintCenter("APELLIDOS", 15)
+		utilities.PrintCenter("VOTOS", 11)
+		fmt.Println()
+		for i:=0; i<len(resultadoCandidatos); i++ {
+			if candidato, ok := mapaCandidatos[resultadoCandidatos[i].CedulaCandidato.Value]; ok {
+				utilities.PrintCenter(candidato.Cedula.Value, 10)
+				utilities.PrintCenter(candidato.Nombre.Value, 10)
+				utilities.PrintCenter(candidato.Apellidos.Value, 15)
+				numeroVotos := strconv.FormatInt(resultadoCandidatos[i].NumeroVotos.Value, 10)
+				utilities.PrintCenter(numeroVotos, 11)
+				fmt.Println()
+			}
+		}
+	}
 }
 
 

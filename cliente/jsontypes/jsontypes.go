@@ -73,7 +73,8 @@ func (o *JsonString) UnmarshalJSON(data []byte) error {
 		return nil
 	} else {
 		str := string(data)
-		if len(str) >= 2 && str[0] == '"' && str[len(str)-1] == '"' {
+		//if len(str) >= 2 && str[0] == '"' && str[len(str)-1] == '"' {
+		if len(str) >= 2 && data[0] == 34 && data[len(data)-1] == 34 {
 			o.Value = str[1:len(str)-1]
 			o.Set = true
 		} else {
@@ -138,8 +139,6 @@ func (o *JsonBool) Assign(data bool) {
 	o.Set = true
 }
 
-
-// Test -> por corregir
 
 func (o *JsonString) ReadLine() error {
 	reader := bufio.NewReader(os.Stdin)
