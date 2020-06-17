@@ -36,7 +36,6 @@ type JsonBool struct {
 }
 
 func (o *JsonString) MarshalJSON() ([]byte, error) {
-	fmt.Println("@@@", o)
 	if o.Set {
 		return []byte("\"" + o.Value + "\""), nil
 	}else {
@@ -181,7 +180,7 @@ func ReadValidLine(target JsonType, message string) {
 		if err == nil {
 			break
 		}else {
-			fmt.Println("error")
+			fmt.Println("[*] error")
 		}
 	}
 }
@@ -213,7 +212,7 @@ func ReadFileAsHexadecimalString(target *JsonString, maxSize int64, confirmation
 			}
 			foto, err = fileReader.ReadAsHexadecimalString(ubicacion)
 			if err != nil {
-				fmt.Println(errorMessage)
+				fmt.Println("[*]", errorMessage)
 			}else{
 				target.Assign(foto)
 				break

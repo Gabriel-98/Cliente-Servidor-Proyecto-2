@@ -1,10 +1,13 @@
 package com.votaciones.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -33,4 +36,10 @@ public class Eleccion {
 	@Column(name="fecha_fin", nullable=false, updatable=true)
 	@JsonFormat(pattern="yyyy/MM/dd'T'HH:mm:ss")
 	private LocalDateTime fechaFin;
+	
+	@Column(name="cancelada", nullable=false, updatable=true)
+	private Boolean cancelada;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="eleccion")
+	private List<ResultadoCandidato> resultadoCandidatos;
 }

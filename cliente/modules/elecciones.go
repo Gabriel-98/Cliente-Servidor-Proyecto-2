@@ -1,10 +1,7 @@
 package modules
 
 import "fmt"
-import "encoding/json"
-import "net/http"
 import "time"
-import "bytes"
 import "main/configuration"
 import "main/objects"
 import "main/readers"
@@ -26,10 +23,7 @@ func CrearEleccion(){
 	zonaHoraria, _ := time.Now().Zone()
 	eleccion.ZonaHoraria.Assign(zonaHoraria)
 
-	eleccionBytes, _ := json.Marshal(eleccion)
-	request, _ := http.NewRequest("POST", configuration.UrlElecciones, bytes.NewBuffer(eleccionBytes))
-	request.Header.Add("Content-Type", "application/json")
-
+	request, _ := utilities.CreateRequest("POST", configuration.UrlElecciones, &eleccion)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
 
@@ -37,27 +31,32 @@ func EditarEleccion(){
 	eleccion := Eleccion{}
 	fmt.Println("EDITAR ELECCION")
 	jsontypes.ReadValidLine(&eleccion.Codigo, "Ingrese el codigo: ")
-	jsontypes.ReadConfirmationAndValidLine(&eleccion.Nombre, "Modificara el nombre [S/]", "Ingrese el nombre: ")
-	jsontypes.ReadConfirmationAndValidLine(&eleccion.Descripcion, "Modificara la descripcion [S/]", "Ingrese la descripcion: ")
-	jsontypes.ReadConfirmationAndValidLine(&eleccion.FechaInicio, "Modificara la fecha de inicio [S/]", "Ingrese la fecha de inicio: ")
-	jsontypes.ReadConfirmationAndValidLine(&eleccion.FechaFin, "Modificara la fecha de cierre [S/]", "Ingrese la fecha de cierre: ")
+	jsontypes.ReadConfirmationAndValidLine(&eleccion.Nombre, "Modificara el nombre [S/]: ", "Ingrese el nombre: ")
+	jsontypes.ReadConfirmationAndValidLine(&eleccion.Descripcion, "Modificara la descripcion [S/]: ", "Ingrese la descripcion: ")
+	jsontypes.ReadConfirmationAndValidLine(&eleccion.FechaInicio, "Modificara la fecha de inicio [S/]: ", "Ingrese la fecha de inicio: ")
+	jsontypes.ReadConfirmationAndValidLine(&eleccion.FechaFin, "Modificara la fecha de cierre [S/]: ", "Ingrese la fecha de cierre: ")
 	zonaHoraria, _ := time.Now().Zone()
 	eleccion.ZonaHoraria.Assign(zonaHoraria)
+
+	request, _ := utilities.CreateRequest("PUT", configuration.UrlElecciones, &eleccion)
+	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
 
 func FinalizarEleccion(){
 	reader := readers.NewLineReader()
+	fmt.Println("FINALIZAR ELECCION")
 	fmt.Println("Ingrese el codigo de la eleccion a finalizar: ")
 	codigo := reader.ReadLine()
-	request, _ := http.NewRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/finalizar", nil)
+	request, _ := utilities.CreateRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/finalizar", nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
 
 func CancelarEleccion(){
 	reader := readers.NewLineReader()
-	fmt.Println("Ingrese el codigo de la eleccion a cancelar: ")
+	fmt.Println("CANCELAR ELECCION")
+	fmt.Print("Ingrese el codigo de la eleccion a cancelar: ")
 	codigo := reader.ReadLine()
-	request, _ := http.NewRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/cancelar", nil)
+	request, _ := utilities.CreateRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/cancelar", nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
 
@@ -87,28 +86,27 @@ func ListarElecciones(){
 		filtro = "CANCELADAS"
 	default:
 		fmt.Println("Opcion incorrecta")
-		break;
+		return ;
 	}
 
-	request, _ := http.NewRequest("GET", configuration.UrlElecciones + "/*/filtro/" + filtro + "/zona-horaria/" + zonaHoraria, nil)
 	var elecciones []Eleccion
-
+	request, _ := utilities.CreateRequest("GET", configuration.UrlElecciones + "/*/filtro/" + filtro + "/zona-horaria/" + zonaHoraria, nil)
 	err := utilities.SendRequest(request, &elecciones, &ErrorStatusMessage{})
-	fmt.Println(err)
-	fmt.Println(elecciones)
 
-	utilities.PrintCenter("CODIGO", 10)
-	utilities.PrintCenter("NOMBRE", 10)
-	utilities.PrintCenter("DESCRIPCION", 15)
-	utilities.PrintCenter("FECHA-INICIO", 23)
-	utilities.PrintCenter("FECHA-FIN", 23)
-	fmt.Println()
-	for i := 0; i < len(elecciones); i++ {
-		utilities.PrintCenter(elecciones[i].Codigo.Value, 10)
-		utilities.PrintCenter(elecciones[i].Nombre.Value, 10)
-		utilities.PrintCenter(elecciones[i].Descripcion.Value, 15)
-		utilities.PrintCenter(elecciones[i].FechaInicio.Value, 23)
-		utilities.PrintCenter(elecciones[i].FechaFin.Value, 23)
+	if err == nil {
+		utilities.PrintCenter("CODIGO", 10)
+		utilities.PrintCenter("NOMBRE", 10)
+		utilities.PrintCenter("DESCRIPCION", 15)
+		utilities.PrintCenter("FECHA-INICIO", 23)
+		utilities.PrintCenter("FECHA-FIN", 23)
 		fmt.Println()
+		for i := 0; i < len(elecciones); i++ {
+			utilities.PrintCenter(elecciones[i].Codigo.Value, 10)
+			utilities.PrintCenter(elecciones[i].Nombre.Value, 10)
+			utilities.PrintCenter(elecciones[i].Descripcion.Value, 15)
+			utilities.PrintCenter(elecciones[i].FechaInicio.Value, 23)
+			utilities.PrintCenter(elecciones[i].FechaFin.Value, 23)
+			fmt.Println()
+		}
 	}
 }

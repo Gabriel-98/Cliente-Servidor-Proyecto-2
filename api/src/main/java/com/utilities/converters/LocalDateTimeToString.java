@@ -8,6 +8,8 @@ public class LocalDateTimeToString extends AbstractConverter<LocalDateTime,Strin
 
 	@Override
 	protected String convert(LocalDateTime source){
+		if(source == null)
+		return null;
 		return source.toString();
 	}
 }

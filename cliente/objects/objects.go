@@ -21,7 +21,7 @@ type Candidato struct {
 	Cedula 			JsonString 		"json:\"cedula\""
 	Nombre 			JsonString 		"json:\"nombre\""
 	Apellidos 		JsonString 		"json:\"apellidos\""
-	Telefono 		JsonString 		"json:\"celular\""
+	Telefono 		JsonString 		"json:\"telefono\""
 	Foto 			JsonString 		"json:\"foto\""
 	NitPartido		JsonString 		"json:\"nitPartido\""
 }

@@ -9,23 +9,57 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class validations {
 	
-	public static void nullValidationResponse(Object o, String message){
+	public static void nonNullValidationResponse(Object o, String message){
 		if(o == null)
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
 	}
 	
-	public static <T extends Comparable<T>> void updatableValidationResponse(T o1, T o2, String message){
-		if(o1.compareTo(o2) == 0)
+	public static void nonUpdatableValidationResponse(Object o1, Object o2, String message){
+		if(!o1.equals(o2))
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
 	}
 	
-	public static void zoneIdValidationResponse(String s, String message) {
-		try{ ZoneId.of(s); }
+	public static void zoneIdValidationResponse(String zone, boolean allowNull, String message) {
+		// allowNull: permite a null ser un formato valido
+		try{
+			if(allowNull){
+				if(zone != null)
+				ZoneId.of(zone);
+			}
+			else
+			ZoneId.of(zone);
+		}
 		catch(Exception e){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message); }
 	}
 	
-	public static void isoLocalDateTimeValidationResponse(String s, String message){
-		try{ LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME); }
-		catch(Exception e) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message); }
+	public static void isoLocalDateTimeValidationResponse(String dateTime, boolean permitNull, String message){
+		try{
+			if(permitNull){
+				if(dateTime != null)
+				LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+			}
+			else
+			LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+		}
+		catch(Exception e){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message); }
+	}
+	
+	public static <T> T selectDefaultValue(T currentValue, T defaultValue){
+		if(currentValue == null)
+		return defaultValue;
+		return currentValue;
+	}
+	
+	public static <T> T updateValue(T currentValue, T newValue){
+		if(newValue == null)
+		return currentValue;
+		return newValue;
+	}
+	
+	public static void onlyNumbers(String text, String message){
+		for(int i=0; i<text.length(); i++) {
+			if(!('0' <= text.charAt(i) && text.charAt(i) <= '9'))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+		}
 	}
 }

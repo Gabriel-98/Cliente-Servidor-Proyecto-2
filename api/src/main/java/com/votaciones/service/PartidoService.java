@@ -7,12 +7,17 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.utilities.FileBytes;
+import com.utilities.validations;
 import com.votaciones.dto.PartidoDTO;
+import com.votaciones.entity.Candidato;
 import com.votaciones.entity.Partido;
+import com.votaciones.repository.CandidatoRepository;
 import com.votaciones.repository.PartidoRepository;
 
 @Service
@@ -22,43 +27,47 @@ public class PartidoService{
 	PartidoRepository partidoRepository;
 	
 	@Autowired
+	CandidatoRepository candidatoRepository;
+	
+	@Autowired
 	ModelMapper modelMapper;
 	
 	public PartidoDTO crear(PartidoDTO partidoDTO){
-		System.out.println(partidoDTO);
-		if(partidoDTO.getNit() == null)
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! El nit no puede ser nulo");
-			
-		String cad = partidoDTO.getAdministracion();
-		for(int i=0; i<cad.length(); i++)
-		System.out.print(cad.charAt(i));
-		System.out.println();
+		validations.nonNullValidationResponse(partidoDTO, "Error! El partido no puede ser nulo");
+		validations.nonNullValidationResponse(partidoDTO.getNit(), "Error! El nit no puede ser nulo");
+		validations.nonNullValidationResponse(partidoDTO.getNombre(), "Error! El nombre no puede ser nulo");
 		
+		partidoDTO.setDireccion(validations.selectDefaultValue(partidoDTO.getDireccion(), ""));
+		partidoDTO.setTelefono(validations.selectDefaultValue(partidoDTO.getTelefono(), ""));
+		partidoDTO.setAdministracion(validations.selectDefaultValue(partidoDTO.getAdministracion(), ""));
+		partidoDTO.setFoto(validations.selectDefaultValue(partidoDTO.getFoto(), ""));
 		
-		String nombre = partidoDTO.getNombre();
-		String direccion = partidoDTO.getDireccion();
-		String telefono = partidoDTO.getTelefono();
-		String administracion = partidoDTO.getAdministracion();
-		if(nombre == null || direccion == null || telefono == null || administracion == null)
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ningun campo debe ser nulo");
-			
 		if(partidoRepository.existsById(partidoDTO.getNit()))
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe un partido con ese nit");
+		if(partidoRepository.existsByNombre(partidoDTO.getNombre()))
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe un partido con ese nombre");
 		
-		Partido partidoRespuesta = partidoRepository.save(modelMapper.map(partidoDTO, Partido.class));		
+		
+		
+		Partido partidoRespuesta = partidoRepository.save(modelMapper.map(partidoDTO, Partido.class));
 		return modelMapper.map(partidoRespuesta, PartidoDTO.class);
 	}
 	
 	public PartidoDTO editar(PartidoDTO partidoDTO){
-		if(partidoDTO == null)
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! El partido no debe ser nulo");
+		validations.nonNullValidationResponse(partidoDTO, "Error! El partido no debe ser nulo");
+		validations.nonNullValidationResponse(partidoDTO.getNit(), "Error! El nit no puede ser nulo");
 		
 		Optional<Partido> optionalPartido = partidoRepository.findById(partidoDTO.getNit());
 		if(!optionalPartido.isPresent())
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! No existe un partido con ese nit");
 		
-		Partido partido = modelMapper.map(partidoDTO, Partido.class);
 		Partido partidoPasado = optionalPartido.get();
+		Partido partido = modelMapper.map(partidoDTO, Partido.class);
+		
+		if(partido.getNombre() != null && !partido.getNombre().equals(partidoPasado.getNombre())){
+			if(partidoRepository.existsByNombre(partido.getNombre()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe un partido con ese nit");
+		}
 		
 		if(partido.getNombre() != null)
 		partidoPasado.setNombre(partido.getNombre());
@@ -68,6 +77,8 @@ public class PartidoService{
 		partidoPasado.setTelefono(partido.getTelefono());
 		if(partido.getAdministracion() != null)
 		partidoPasado.setAdministracion(partido.getAdministracion());
+		if(partido.getFoto() != null)
+		partidoPasado.setFoto(partido.getFoto());
 		
 		Partido partidoRespuesta = partidoRepository.save(partidoPasado);
 		PartidoDTO partidoRespuestaDTO = modelMapper.map(partidoRespuesta, PartidoDTO.class);
@@ -75,26 +86,46 @@ public class PartidoService{
 	}
 	
 	public Boolean eliminar(String nit){
-		System.out.println(nit);
-		if(nit == null)
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! El nit no puede ser nulo");
-		System.out.println(nit);
-		if(!partidoRepository.existsById(nit)){
-			System.out.println(".");
-			throw new ResponseStatusException(HttpStatus.ACCEPTED, "Error! El partido no existe");	
+		validations.nonNullValidationResponse(nit, "Error! El nit no puede ser nulo");
+		
+		Optional<Partido> optionalPartido = partidoRepository.findById(nit);
+		if(!optionalPartido.isPresent())
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! El partido no existe");
+		
+		Partido partido = optionalPartido.get();
+		List<Candidato> candidatos = partido.getCandidatos();
+		ListIterator<Candidato> iterator = candidatos.listIterator();
+		while(iterator.hasNext()) {
+			Candidato candidato = iterator.next();
+			candidato.setPartido(null);
 		}
-		System.out.println(nit);
-		partidoRepository.deleteById(nit);
+		candidatoRepository.saveAll(candidatos);
+		candidatos.clear();
+		partidoRepository.save(partido);
+		partidoRepository.delete(partido);
 		return true;
-		//return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
 	}
 	
 	public List<PartidoDTO> listar(){
-		List<Partido> partidos = partidoRepository.findAll();
+		List<Partido> partidos = partidoRepository.findAll(Sort.by("nit"));
 		List<PartidoDTO> partidosDTO = new LinkedList<PartidoDTO>();
 		ListIterator<Partido> iterator = partidos.listIterator();
 		while(iterator.hasNext())
 		partidosDTO.add(modelMapper.map(iterator.next(), PartidoDTO.class));
 		return partidosDTO;
+	}
+	
+	public byte[] mostrarFoto(String nit){
+		validations.nonNullValidationResponse(nit, "Error! El nit no puede ser nulo");
+			
+		Optional<Partido> optionalPartido = partidoRepository.findById(nit);
+		if(!optionalPartido.isPresent())
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! No existe un partido con ese nit");
+	
+		Partido partido = optionalPartido.get();
+		String foto = partido.getFoto();
+		
+		FileBytes fotoBytes = new FileBytes(foto);
+		return fotoBytes.getByteArray();
 	}
 }

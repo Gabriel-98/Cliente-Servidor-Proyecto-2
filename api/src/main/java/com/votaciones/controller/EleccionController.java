@@ -26,28 +26,28 @@ public class EleccionController {
 		return eleccionService.crear(eleccionDTO);
 	}
 	
-	/*@PutMapping
+	@PutMapping
 	public EleccionDTO editar(@RequestBody EleccionDTO eleccionDTO){
 		return eleccionService.editar(eleccionDTO);
-	}*/
+	}
 	
-	/*@PutMapping("/{codigo}/finalizar")
+	@PutMapping("/{codigo}/finalizar")
 	public boolean finalizar(@PathVariable("codigo") String codigo){
 		return eleccionService.finalizar(codigo);
-	}*/
+	}
 	
-	/*@PutMapping("/{codigo}/cancelar")
+	@PutMapping("/{codigo}/cancelar")
 	public boolean cancelar(@PathVariable("codigo") String codigo) {
 		return eleccionService.cancelar(codigo);
-	}*/
+	}
 	
 	/*@GetMapping("/{codigo}/resultado")
 	public List<ResultadoCandidatoDTO> resultadoEleccion(@PathVariable("codigo") String codigo){
 		return eleccionService.resultadoEleccion(codigo);
 	}*/
 	
-	//@GetMapping("/*/filtro/{filtro}/zona-horaria/{zona}")
-	/*public List<EleccionDTO> listar(@PathVariable("filtro") String filtro, @PathVariable("zona") String zona){
+	@GetMapping("/*/filtro/{filtro}/zona-horaria/{zona}")
+	public List<EleccionDTO> listar(@PathVariable("filtro") String filtro, @PathVariable("zona") String zona){
 		return eleccionService.listar(filtro, zona);
-	}*/
+	}
 }

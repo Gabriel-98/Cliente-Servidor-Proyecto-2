@@ -1,8 +1,12 @@
 package com.votaciones.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -27,7 +31,10 @@ public class Partido {
 	
 	@Column(name="administracion", nullable=false, updatable=true)
 	private String administracion;
-
+	
 	@Column(name="foto", nullable=false, updatable=true, columnDefinition="TEXT")
 	private String foto;
+
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="partido")
+	private List<Candidato> candidatos;
 }

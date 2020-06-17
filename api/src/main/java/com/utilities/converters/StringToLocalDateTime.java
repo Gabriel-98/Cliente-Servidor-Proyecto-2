@@ -9,6 +9,8 @@ public class StringToLocalDateTime extends AbstractConverter<String,LocalDateTim
 
 	@Override
 	protected LocalDateTime convert(String source){
+		if(source == null)
+		return null;
 		return LocalDateTime.parse(source, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 	}
 }
