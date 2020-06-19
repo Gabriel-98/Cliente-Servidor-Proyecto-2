@@ -76,7 +76,7 @@ public class EleccionService{
 		if(eleccionRepository.existsByNombre(eleccion.getNombre()))
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error! Ya existe una eleccion con ese nombre");
 		
-		/*List<Votante> votantes = votanteRepository.findAllByActivo(true);
+		List<Votante> votantes = votanteRepository.findAllByActivo(true);
 		List<Voto> votos = new LinkedList<Voto>();
 		ListIterator<Votante> iterator = votantes.listIterator();
 		while(iterator.hasNext()){
@@ -85,7 +85,8 @@ public class EleccionService{
 			voto.setVotante(iterator.next());
 			voto.setCedulaCandidato(null);
 			votos.add(voto);
-		}*/
+		}
+		eleccion.setVotos(votos);
 		
 		Eleccion eleccionRespuesta = eleccionRepository.save(eleccion);
 		EleccionDTO eleccionRespuestaDTO = modelMapper.map(eleccionRespuesta, EleccionDTO.class);

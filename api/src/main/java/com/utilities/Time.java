@@ -1,5 +1,6 @@
 package com.utilities;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +56,24 @@ public class Time {
 		return null;
 		LocalDateTime localDateTime = LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 		return toTimeZone(localDateTime, ZoneId.of(sourceZone), ZoneId.of(targetZone)).toString();
+	}
+	
+	public static int differenceInYears(LocalDate date1, LocalDate date2){
+		// years(date1) - years(date2)
+		int ans = 0, sign = 1;
+		if(date2.isAfter(date1)){
+			LocalDate temp = date1;
+			date1 = date2; date2 = temp;
+			sign = -1;
+		}		
+		ans = date1.getYear() - date2.getYear();
+		if(date1.getMonthValue() < date2.getMonthValue())
+		ans--;
+		else if(date1.getMonthValue() == date2.getMonthValue()){
+			if(date1.getDayOfMonth() < date2.getDayOfMonth())
+			ans--;
+		}
+		return ans * sign;
 	}
 	
 	public static int differenceInYears(LocalDateTime ldt1, LocalDateTime ldt2){

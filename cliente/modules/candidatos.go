@@ -43,9 +43,9 @@ func InscribirCandidato(){
 	lineReader := readers.NewLineReader()
 	fmt.Println("INSCRIBIR CANDIDATO EN ELECCION")
 	fmt.Print("Ingrese la cedula del candidato: ")
-	cedulaCandidato := lineReader.ReadLine()
+	cedulaCandidato, _ := lineReader.ReadLine()
 	fmt.Print("Ingrese el codigo de la eleccion: ")
-	codigoEleccion := lineReader.ReadLine()
+	codigoEleccion, _ := lineReader.ReadLine()
 	request, _ := utilities.CreateRequest("POST", configuration.UrlCandidatos + "/" + cedulaCandidato + "/eleccion/" + codigoEleccion, nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
@@ -54,9 +54,9 @@ func CancelarInscripcionCandidato(){
 	lineReader := readers.NewLineReader()
 	fmt.Println("CANCELAR INSCRIPCION DE CANDIDATO EN ELECCION")
 	fmt.Print("Ingrese la cedula del candidato: ")
-	cedulaCandidato := lineReader.ReadLine()
+	cedulaCandidato, _ := lineReader.ReadLine()
 	fmt.Print("Ingrese el codigo de la eleccion: ")
-	codigoEleccion := lineReader.ReadLine()
+	codigoEleccion, _ := lineReader.ReadLine()
 	request, _ := utilities.CreateRequest("DELETE", configuration.UrlCandidatos + "/" + cedulaCandidato + "/eleccion/" + codigoEleccion, nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
@@ -69,7 +69,7 @@ func ListarCandidatos(){
 	fmt.Println("3. POR ELECCION")
 
 	fmt.Print("Ingrese la opcion para listarlas: ")
-	line := lineReader.ReadLine()
+	line, _ := lineReader.ReadLine()
 
 	var candidatos []Candidato
 	var err error
@@ -79,12 +79,12 @@ func ListarCandidatos(){
 		err = utilities.SendRequest(request, &candidatos, &ErrorStatusMessage{})
 	case "2":
 		fmt.Print("Ingrese el nit de la partido: ")
-		nitPartido := lineReader.ReadLine()
+		nitPartido, _ := lineReader.ReadLine()
 		request, _ := utilities.CreateRequest("GET", configuration.UrlCandidatos + "/*/partido/" + nitPartido, nil)
 		err = utilities.SendRequest(request, &candidatos, &ErrorStatusMessage{})
 	case "3":
 		fmt.Print("Ingrese el codigo de la eleccion: ")
-		codigoEleccion := lineReader.ReadLine()
+		codigoEleccion, _ := lineReader.ReadLine()
 		request, _ := utilities.CreateRequest("GET", configuration.UrlCandidatos + "/*/eleccion/" + codigoEleccion, nil)
 		err = utilities.SendRequest(request, &candidatos, &ErrorStatusMessage{})
 	default:

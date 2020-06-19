@@ -9,17 +9,17 @@ func menuVotante(){
 	var option string = "1"
 
 	for option != "0" {
-		fmt.Println("Funciones: ")
+		fmt.Println("\nFunciones: ")
 		fmt.Println("1. Registrarse")
-		fmt.Println("2. [X] Votar")
+		fmt.Println("2. Votar")
 
 		fmt.Print("Ingrese una opcion: ")
-		option = lineReader.ReadLine()
+		option, _ = lineReader.ReadLine()
 		switch option {
 		case "1":
 			modules.CrearVotante()
 		case "2":
-			//modules.()
+			modules.Votar()
 		case "0":
 			//
 		default:

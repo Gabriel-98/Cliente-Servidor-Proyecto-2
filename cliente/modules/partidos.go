@@ -42,7 +42,7 @@ func EliminarPartido(){
 	lineReader := readers.NewLineReader()
 	fmt.Println("ELIMINAR PARTIDO POLITICO")
 	fmt.Print("Ingrese el nit del partido a eliminar: ")
-	nit := lineReader.ReadLine()
+	nit, _ := lineReader.ReadLine()
 	request, _ := utilities.CreateRequest("DELETE", configuration.UrlPartidos + "/" + nit, nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }

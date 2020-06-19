@@ -2,8 +2,6 @@ package jsontypes
 
 import "strconv"
 import "errors"
-import "bufio"
-import "os"
 import "fmt"
 import "main/readers"
 
@@ -141,10 +139,9 @@ func (o *JsonBool) Assign(data bool) {
 
 
 func (o *JsonString) ReadLine() error {
-	reader := bufio.NewReader(os.Stdin)
-	line, err := reader.ReadString('\n')
+	lineReader := readers.NewLineReader()
+	line, err := lineReader.ReadLine()
 	if err == nil {
-		line = line[0:len(line)-1]
 		if line != "" {
 			o.Value = line
 			o.Set = true
@@ -155,12 +152,13 @@ func (o *JsonString) ReadLine() error {
 
 
 func (o *JsonInt) ReadLine() error {
-	reader := bufio.NewReader(os.Stdin)
-	line, err := reader.ReadString('\n')
+	var err error; 	var line string
+	lineReader := readers.NewLineReader()
+	line, err = lineReader.ReadLine()
 	if err == nil {
-		line = line[0:len(line)-1]
 		if line != "" {
-			value, err := strconv.ParseInt(line, 10, 64)
+			var value int64
+			value, err = strconv.ParseInt(line, 10, 64)
 			if err == nil {
 				o.Value = value
 				o.Set = true
@@ -185,10 +183,9 @@ func ReadValidLine(target JsonType, message string) {
 }
 
 func ReadConfirmationAndValidLine(target JsonType, confirmationMessage string, message string) {
-	reader := bufio.NewReader(os.Stdin)
+	lineReader := readers.NewLineReader()
 	fmt.Print(confirmationMessage)
-	line, _ := reader.ReadString('\n')
-	line = line[0:len(line)-1]
+	line, _ := lineReader.ReadLine()
 	if line == "S" {
 		ReadValidLine(target, message)
 	}
@@ -196,16 +193,16 @@ func ReadConfirmationAndValidLine(target JsonType, confirmationMessage string, m
 
 // Lectura de archivos
 func ReadFileAsHexadecimalString(target *JsonString, maxSize int64, confirmationMessage string, message string, errorMessage string) {
-	fmt.Println(confirmationMessage)
 	lineReader := readers.NewLineReader()
 	fileReader := readers.NewFileReader(maxSize)
-	line := lineReader.ReadLine()
+	fmt.Println(confirmationMessage)
+	line, _ := lineReader.ReadLine()
 	if line == "S" {
 		var foto string
 		var err error 
 		for true {
 			fmt.Print(message)
-			ubicacion := lineReader.ReadLine()
+			ubicacion, _ := lineReader.ReadLine()
 			if ubicacion == "" {
 				break
 			}

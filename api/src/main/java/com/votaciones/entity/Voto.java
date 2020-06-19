@@ -1,7 +1,5 @@
 package com.votaciones.entity;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,6 +29,6 @@ public class Voto {
 	@JoinColumn(name="cedula_votante", referencedColumnName="cedula", nullable=false, updatable=false)
 	private Votante votante;
 	
-	@Column(name="cedulaCandidato", nullable=true, updatable=false)
+	@Column(name="cedulaCandidato", nullable=true, updatable=true)
 	private String cedulaCandidato;
 }

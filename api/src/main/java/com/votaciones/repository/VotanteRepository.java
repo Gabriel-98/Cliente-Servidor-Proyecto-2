@@ -10,4 +10,5 @@ import com.votaciones.entity.Votante;
 @Repository
 public interface VotanteRepository extends JpaRepository<Votante,String> {
 	List<Votante> findAllByActivo(Boolean activo);
+	List<Votante> findAllByActivoOrderByCedula(Boolean activo);
 }

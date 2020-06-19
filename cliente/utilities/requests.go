@@ -42,7 +42,7 @@ func SendRequest(request *http.Request, data interface{}, errorBody ErrorMessage
 			barr, err := ioutil.ReadAll(response.Body)
 			if err != nil{
 				fmt.Println("[*] Error al leer el body de la respuesta")
-				return err;
+				return err
 			}
 
 			if data != nil {
@@ -55,7 +55,7 @@ func SendRequest(request *http.Request, data interface{}, errorBody ErrorMessage
 			}
 		case 400:
 			body := response.Body
-			barr,err := ioutil.ReadAll(body)
+			barr, err := ioutil.ReadAll(body)
 			if err != nil {
 				fmt.Println("[*]", err)
 				return err;
@@ -66,6 +66,7 @@ func SendRequest(request *http.Request, data interface{}, errorBody ErrorMessage
 				return err;
 			}
 			fmt.Println(errorBody.ReadErrorMessage())
+			return errors.New("Status Code: 400 " + errorBody.ReadErrorMessage())
 		default:
 			fmt.Println("[*]", response.Status)
 			return errors.New("Invalid Status Code")

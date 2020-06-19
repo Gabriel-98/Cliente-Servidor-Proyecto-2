@@ -45,19 +45,19 @@ func EditarEleccion(){
 }
 
 func FinalizarEleccion(){
-	reader := readers.NewLineReader()
+	lineReader := readers.NewLineReader()
 	fmt.Println("FINALIZAR ELECCION")
 	fmt.Println("Ingrese el codigo de la eleccion a finalizar: ")
-	codigo := reader.ReadLine()
+	codigo, _ := lineReader.ReadLine()
 	request, _ := utilities.CreateRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/finalizar", nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
 
 func CancelarEleccion(){
-	reader := readers.NewLineReader()
+	lineReader := readers.NewLineReader()
 	fmt.Println("CANCELAR ELECCION")
 	fmt.Print("Ingrese el codigo de la eleccion a cancelar: ")
-	codigo := reader.ReadLine()
+	codigo, _ := lineReader.ReadLine()
 	request, _ := utilities.CreateRequest("PUT", configuration.UrlElecciones + "/" + codigo + "/cancelar", nil)
 	utilities.SendRequest(request, nil, &ErrorStatusMessage{})
 }
@@ -66,7 +66,7 @@ func MostrarResultadoEleccion(){
 	lineReader := readers.NewLineReader()
 	fmt.Println("RESULTADO ELECCION")
 	fmt.Print("Ingrese el codigo de la eleccion: ")
-	codigoEleccion := lineReader.ReadLine()
+	codigoEleccion, _ := lineReader.ReadLine()
 
 	var resultadoCandidatos []ResultadoCandidato
 	request, err := utilities.CreateRequest("GET", configuration.UrlElecciones + "/" + codigoEleccion + "/resultado", nil)
@@ -105,7 +105,7 @@ func MostrarResultadoEleccion(){
 
 
 func ListarElecciones(){
-	reader := readers.NewLineReader()
+	lineReader := readers.NewLineReader()
 	fmt.Println("LISTAR ELECCIONES")
 	fmt.Println("1. FINALIZADAS")
 	fmt.Println("2. ABIERTAS")
@@ -113,7 +113,7 @@ func ListarElecciones(){
 	fmt.Println("4. CANCELADAS")
 
 	fmt.Print("Ingrese la opcion para listarlas: ")
-	line := reader.ReadLine()
+	line, _ := lineReader.ReadLine()
 
 	var filtro string
 	zonaHoraria, _ := time.Now().Zone()

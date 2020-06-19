@@ -30,11 +30,11 @@ public class Eleccion {
 	private String descripcion;
 		
 	@Column(name="fecha_inicio", nullable=false, updatable=true)
-	@JsonFormat(pattern="yyyy/MM/dd'T'HH:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime fechaInicio;
 	
 	@Column(name="fecha_fin", nullable=false, updatable=true)
-	@JsonFormat(pattern="yyyy/MM/dd'T'HH:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime fechaFin;
 	
 	@Column(name="cancelada", nullable=false, updatable=true)
@@ -42,4 +42,7 @@ public class Eleccion {
 	
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="eleccion")
 	private List<ResultadoCandidato> resultadoCandidatos;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="eleccion")
+	private List<Voto> votos;
 }

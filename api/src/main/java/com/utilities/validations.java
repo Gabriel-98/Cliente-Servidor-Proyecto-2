@@ -1,5 +1,6 @@
 package com.utilities;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +41,18 @@ public class validations {
 			}
 			else
 			LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+		}
+		catch(Exception e){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message); }
+	}
+	
+	public static void isoLocalDateValidationResponse(String date, boolean permitNull, String message) {
+		try{
+			if(permitNull){
+				if(date != null)
+				LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+			}
+			else
+			LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
 		}
 		catch(Exception e){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message); }
 	}
